@@ -20,6 +20,8 @@ type puzzle struct {
 	gr, gc int
 }
 
+type position struct{ r, c int }
+
 func readPuzzle(input io.Reader) *puzzle {
 	w, h, sr, sc, gr, gc := 0, 0, 0, 0, 0, 0
 	fmt.Fscanf(input, "%d %d\n", &w, &h)
@@ -59,6 +61,30 @@ func (p *puzzle) width() int {
 
 func (p *puzzle) height() int {
 	return len(p.cell)
+}
+
+func (p *puzzle) count(t cellType) int {
+	count := 0
+	for r := range p.cell {
+		for c := range p.cell[r] {
+			if p.cell[r][c] == t {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+func (p *puzzle) cellsOfType(t cellType) []position {
+	var list []position
+	for r := range p.cell {
+		for c := range p.cell[r] {
+			if p.cell[r][c] == t {
+				list = append(list, position{r: r, c: c})
+			}
+		}
+	}
+	return list
 }
 
 func (p *puzzle) isValidCoordinate(r, c int) bool {
