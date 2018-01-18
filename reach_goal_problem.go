@@ -90,5 +90,5 @@ func (p rgProblem) pathCost(path []action) int {
 func rgpHeuristic(pr problem, s state) int {
 	p := pr.(rgProblem)
 	ss := s.(rgState)
-	return abs(p.puzzle.gr-ss.r) + abs(p.puzzle.gc-ss.c)
+	return manhattanDistance2(p.puzzle.gr, p.puzzle.gc, ss.r, ss.c)
 }
