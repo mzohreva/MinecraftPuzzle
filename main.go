@@ -10,8 +10,7 @@ func main() {
 	p.print()
 
 	// rgp := newReachGoalProblem(p)
-	// actions := [...]action{rgNORTH, rgSOUTH, rgEAST, rgWEST}
-	// optimalPath := aStarSearch(rgp, rgpHeuristic, actions[:])
+	// optimalPath := aStarSearch(rgp, rgpHeuristic, rgActions[:])
 	// s := rgp.startState()
 	// for _, a := range optimalPath {
 	// 	s = rgp.successor(s, a)
@@ -20,8 +19,7 @@ func main() {
 	// fmt.Println("Cost =", rgp.pathCost(optimalPath))
 
 	cmp := newCollectMinablesProblem(p)
-	actions := [...]action{cmNORTH, cmSOUTH, cmEAST, cmWEST, cmMINE}
-	optimalPath := aStarSearch(cmp, cmpHeuristic, actions[:])
+	optimalPath := aStarSearch(cmp, cmpHeuristic, cmActions[:])
 	s := cmp.startState()
 	for _, a := range optimalPath {
 		s = cmp.successor(s, a)

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"sort"
 )
 
 type cellType int
@@ -21,6 +22,15 @@ type puzzle struct {
 }
 
 type position struct{ r, c int }
+
+func sortPositionSlice(s []position) {
+	sort.Slice(s, func(i, j int) bool {
+		if s[i].r == s[j].r {
+			return s[i].c < s[j].c
+		}
+		return s[i].r < s[j].r
+	})
+}
 
 func readPuzzle(input io.Reader) *puzzle {
 	w, h, sr, sc, gr, gc := 0, 0, 0, 0, 0, 0

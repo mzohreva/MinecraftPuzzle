@@ -32,6 +32,10 @@ const (
 	rgWEST
 )
 
+var rgActions = [...]action{
+	rgNORTH, rgSOUTH, rgEAST, rgWEST,
+}
+
 func (a rgAction) action() string {
 	switch a {
 	case rgNORTH:

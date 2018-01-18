@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"hash/fnv"
-	"sort"
 )
 
 type cmProblem struct { // cm: collect minables
@@ -11,12 +10,13 @@ type cmProblem struct { // cm: collect minables
 }
 
 type cmState struct {
-	r, c  int
-	mined []position // position of mined objects
+	r, c   int
+	mined  []position // position of mined objects
+	filled []position // position of filled lava
 }
 
 func (s cmState) state() string {
-	return fmt.Sprintf("{(%v,%v),%v}", s.r, s.c, len(s.mined))
+	return fmt.Sprintf("{(%v,%v),%v,%v}", s.r, s.c, len(s.mined), len(s.filled))
 }
 
 func (s cmState) hash() uint64 {
@@ -25,7 +25,28 @@ func (s cmState) hash() uint64 {
 	for _, m := range s.mined {
 		fmt.Fprintf(h, "%v%v", m.r, m.c)
 	}
+	for _, f := range s.filled {
+		fmt.Fprintf(h, "%v%v", f.r, f.c)
+	}
 	return h.Sum64()
+}
+
+func (s cmState) hasMined(pos position) bool {
+	for _, m := range s.mined {
+		if m.r == pos.r && m.c == pos.c {
+			return true
+		}
+	}
+	return false
+}
+
+func (s cmState) hasFilled(pos position) bool {
+	for _, f := range s.filled {
+		if f.r == pos.r && f.c == pos.c {
+			return true
+		}
+	}
+	return false
 }
 
 type cmAction int
@@ -36,7 +57,16 @@ const (
 	cmEAST
 	cmWEST
 	cmMINE
+	cmFILLNORTH
+	cmFILLSOUTH
+	cmFILLEAST
+	cmFILLWEST
 )
+
+var cmActions = [...]action{
+	cmNORTH, cmSOUTH, cmEAST, cmWEST,
+	cmMINE, cmFILLNORTH, cmFILLSOUTH, cmFILLEAST, cmFILLWEST,
+}
 
 func (a cmAction) action() string {
 	switch a {
@@ -50,6 +80,14 @@ func (a cmAction) action() string {
 		return "W"
 	case cmMINE:
 		return ">"
+	case cmFILLNORTH:
+		return "~N"
+	case cmFILLSOUTH:
+		return "~S"
+	case cmFILLEAST:
+		return "~E"
+	case cmFILLWEST:
+		return "~W"
 	default:
 		return "?"
 	}
@@ -71,7 +109,10 @@ func (p cmProblem) isGoalState(s state) bool {
 func (p cmProblem) isValidState(s state) bool {
 	ss := s.(cmState)
 	cell := p.puzzle.cell[ss.r][ss.c]
-	return p.puzzle.isValidCoordinate(ss.r, ss.c) && (cell == empty || cell == minable)
+	pos := position{r: ss.r, c: ss.c}
+	return p.puzzle.isValidCoordinate(ss.r, ss.c) &&
+		(len(ss.mined) >= len(ss.filled)) &&
+		((cell == empty || cell == minable) || (cell == lava && ss.hasFilled(pos)))
 }
 
 func (p cmProblem) successor(s state, a action) state {
@@ -80,6 +121,8 @@ func (p cmProblem) successor(s state, a action) state {
 	r, c := ss.r, ss.c
 	mined := make([]position, len(ss.mined))
 	copy(mined, ss.mined)
+	filled := make([]position, len(ss.filled))
+	copy(filled, ss.filled)
 	switch aa {
 	case cmNORTH:
 		r--
@@ -91,26 +134,33 @@ func (p cmProblem) successor(s state, a action) state {
 		c--
 	case cmMINE:
 		if p.puzzle.cell[r][c] == minable {
-			// Check if not already mined
-			alreadyMined := false
-			for _, mp := range ss.mined {
-				if mp.r == r && mp.c == c {
-					alreadyMined = true
-					break
-				}
+			pos := position{r: r, c: c}
+			if !ss.hasMined(pos) {
+				mined = append(mined, pos)
+				sortPositionSlice(mined)
 			}
-			if !alreadyMined {
-				mined = append(mined, position{r: r, c: c})
-				sort.Slice(mined, func(i, j int) bool {
-					if mined[i].r == mined[j].r {
-						return mined[i].c < mined[j].c
-					}
-					return mined[i].r < mined[j].r
-				})
+		}
+	case cmFILLNORTH, cmFILLSOUTH, cmFILLEAST, cmFILLWEST:
+		fr, fc := r, c
+		switch aa {
+		case cmFILLNORTH:
+			fr--
+		case cmFILLSOUTH:
+			fr++
+		case cmFILLEAST:
+			fc++
+		case cmFILLWEST:
+			fc--
+		}
+		if p.puzzle.isValidCoordinate(fr, fc) && p.puzzle.cell[fr][fc] == lava {
+			fpos := position{r: fr, c: fc}
+			if !ss.hasFilled(fpos) && len(ss.mined) > len(ss.filled) {
+				filled = append(filled, fpos)
+				sortPositionSlice(filled)
 			}
 		}
 	}
-	return cmState{r: r, c: c, mined: mined}
+	return cmState{r: r, c: c, mined: mined, filled: filled}
 }
 
 func (p cmProblem) pathCost(path []action) int {
@@ -120,30 +170,26 @@ func (p cmProblem) pathCost(path []action) int {
 func cmpHeuristic(pr problem, s state) int {
 	p := pr.(cmProblem)
 	ss := s.(cmState)
-	distToGoal := manhattanDistance2(p.puzzle.gr, p.puzzle.gc, ss.r, ss.c)
+	pos := position{r: ss.r, c: ss.c}
+	goal := position{r: p.puzzle.gr, c: p.puzzle.gc}
+
 	var minables []position
 	for _, m := range p.puzzle.cellsOfType(minable) {
-		alreadyMined := false
-		for _, mp := range ss.mined {
-			if mp.r == m.r && mp.c == m.c {
-				alreadyMined = true
-				break
-			}
-		}
-		if !alreadyMined {
+		if !ss.hasMined(m) {
 			minables = append(minables, m)
 		}
 	}
 	if len(minables) == 0 {
-		return distToGoal
+		return manhattanDistance(pos, goal)
 	}
-	pos := position{r: ss.r, c: ss.c}
-	closestMinable := manhattanDistance(pos, minables[0])
-	for _, m := range minables {
+	nearestMinableDist := manhattanDistance(pos, minables[0])
+	nearestMinable := minables[0]
+	for _, m := range minables[1:] {
 		dist := manhattanDistance(pos, m)
-		if dist < closestMinable {
-			closestMinable = dist
+		if dist < nearestMinableDist {
+			nearestMinableDist = dist
+			nearestMinable = m
 		}
 	}
-	return distToGoal + closestMinable
+	return nearestMinableDist + manhattanDistance(nearestMinable, goal)
 }
