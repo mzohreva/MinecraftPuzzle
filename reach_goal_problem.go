@@ -64,15 +64,8 @@ func (p rgProblem) isGoalState(s state) bool {
 	return ss.r == p.puzzle.gr && ss.c == p.puzzle.gc
 }
 
-func (p rgProblem) isValidState(s state) bool {
-	ss := s.(rgState)
-	return p.puzzle.isValidCoordinate(ss.r, ss.c) &&
-		p.puzzle.cell[ss.r][ss.c] == empty
-}
-
 func (p rgProblem) successor(s state, a action) state {
-	ss := s.(rgState)
-	aa := a.(rgAction)
+	ss, aa := s.(rgState), a.(rgAction)
 	r, c := ss.r, ss.c
 	switch aa {
 	case rgNORTH:
@@ -84,7 +77,10 @@ func (p rgProblem) successor(s state, a action) state {
 	case rgWEST:
 		c--
 	}
-	return rgState{r: r, c: c}
+	if p.puzzle.isValidCoordinate(r, c) && p.puzzle.cell[r][c] == empty {
+		return rgState{r: r, c: c}
+	}
+	return s
 }
 
 func (p rgProblem) pathCost(path []action) int {

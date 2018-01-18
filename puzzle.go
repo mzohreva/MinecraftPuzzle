@@ -23,13 +23,19 @@ type puzzle struct {
 
 type position struct{ r, c int }
 
-func sortPositionSlice(s []position) {
+func sortPositions(s []position) {
 	sort.Slice(s, func(i, j int) bool {
 		if s[i].r == s[j].r {
 			return s[i].c < s[j].c
 		}
 		return s[i].r < s[j].r
 	})
+}
+
+func duplicatePositions(s []position) []position {
+	c := make([]position, len(s))
+	copy(c, s)
+	return c
 }
 
 func readPuzzle(input io.Reader) *puzzle {

@@ -10,7 +10,6 @@ type action interface {
 type problem interface {
 	startState() state
 	isGoalState(state) bool
-	isValidState(state) bool
 	successor(state, action) state
 	pathCost(path []action) int
 }

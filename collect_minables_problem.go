@@ -106,23 +106,10 @@ func (p cmProblem) isGoalState(s state) bool {
 	return ss.r == p.puzzle.gr && ss.c == p.puzzle.gc && len(ss.mined) == p.puzzle.count(minable)
 }
 
-func (p cmProblem) isValidState(s state) bool {
-	ss := s.(cmState)
-	cell := p.puzzle.cell[ss.r][ss.c]
-	pos := position{r: ss.r, c: ss.c}
-	return p.puzzle.isValidCoordinate(ss.r, ss.c) &&
-		(len(ss.mined) >= len(ss.filled)) &&
-		((cell == empty || cell == minable) || (cell == lava && ss.hasFilled(pos)))
-}
-
 func (p cmProblem) successor(s state, a action) state {
-	ss := s.(cmState)
-	aa := a.(cmAction)
+	ss, aa := s.(cmState), a.(cmAction)
 	r, c := ss.r, ss.c
-	mined := make([]position, len(ss.mined))
-	copy(mined, ss.mined)
-	filled := make([]position, len(ss.filled))
-	copy(filled, ss.filled)
+	mined, filled := duplicatePositions(ss.mined), duplicatePositions(ss.filled)
 	switch aa {
 	case cmNORTH:
 		r--
@@ -137,7 +124,7 @@ func (p cmProblem) successor(s state, a action) state {
 			pos := position{r: r, c: c}
 			if !ss.hasMined(pos) {
 				mined = append(mined, pos)
-				sortPositionSlice(mined)
+				sortPositions(mined)
 			}
 		}
 	case cmFILLNORTH, cmFILLSOUTH, cmFILLEAST, cmFILLWEST:
@@ -152,15 +139,23 @@ func (p cmProblem) successor(s state, a action) state {
 		case cmFILLWEST:
 			fc--
 		}
-		if p.puzzle.isValidCoordinate(fr, fc) && p.puzzle.cell[fr][fc] == lava {
+		if p.puzzle.isValidCoordinate(fr, fc) &&
+			p.puzzle.cell[fr][fc] == lava {
 			fpos := position{r: fr, c: fc}
-			if !ss.hasFilled(fpos) && len(ss.mined) > len(ss.filled) {
+			if !ss.hasFilled(fpos) {
 				filled = append(filled, fpos)
-				sortPositionSlice(filled)
+				sortPositions(filled)
 			}
 		}
 	}
-	return cmState{r: r, c: c, mined: mined, filled: filled}
+	pos := position{r: r, c: c}
+	cell := p.puzzle.cell[r][c]
+	if p.puzzle.isValidCoordinate(r, c) &&
+		len(mined) >= len(filled) &&
+		((cell == empty || cell == minable) || (cell == lava && ss.hasFilled(pos))) {
+		return cmState{r: r, c: c, mined: mined, filled: filled}
+	}
+	return s
 }
 
 func (p cmProblem) pathCost(path []action) int {

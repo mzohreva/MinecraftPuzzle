@@ -26,9 +26,6 @@ func aStarSearch(pr problem, h heuristic, actions []action) []action {
 		V[s.hash()] = struct{}{} // Mark as visited
 		for _, a := range actions {
 			n := pr.successor(s, a)
-			if !pr.isValidState(n) {
-				continue
-			}
 			if _, visited := V[n.hash()]; visited {
 				continue
 			}
