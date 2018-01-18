@@ -1,12 +1,12 @@
-package main
+package puzzle
 
 import (
 	"fmt"
 )
 
-type heuristic func(problem, state) int
+type heuristic func(problem, State) int
 
-func aStarSearch(pr problem, h heuristic, actions []action) []action {
+func aStarSearch(pr problem, h heuristic, actions []Action) []Action {
 	start := pr.startState()
 	Q := newMinHeap()
 	Q.push(start, nil, h(pr, start))
@@ -24,11 +24,11 @@ func aStarSearch(pr problem, h heuristic, actions []action) []action {
 		}
 		V[s.hash()] = struct{}{} // Mark as visited
 		for _, a := range actions {
-			n := s.successor(pr.getPuzzle(), a)
+			n := s.Successor(pr.getPuzzle(), a)
 			if _, visited := V[n.hash()]; visited {
 				continue
 			}
-			newPath := make([]action, len(path), len(path)+1)
+			newPath := make([]Action, len(path), len(path)+1)
 			copy(newPath, path)
 			newPath = append(newPath, a)
 			cost := pr.pathCost(newPath) + h(pr, n)

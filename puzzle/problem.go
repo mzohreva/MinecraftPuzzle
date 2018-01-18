@@ -1,4 +1,4 @@
-package main
+package puzzle
 
 import (
 	"fmt"
@@ -6,23 +6,24 @@ import (
 )
 
 type problem interface {
-	getPuzzle() *puzzle
-	startState() state
-	isGoalState(state) bool
-	pathCost(path []action) int
+	getPuzzle() *Puzzle
+	startState() State
+	isGoalState(State) bool
+	pathCost(path []Action) int
 }
 
-type state struct {
+// State of game
+type State struct {
 	r, c   int
 	mined  []position // position of mined objects
 	filled []position // position of filled lava
 }
 
-func (s state) state() string {
+func (s State) String() string {
 	return fmt.Sprintf("{(%v,%v),%v,%v}", s.r, s.c, len(s.mined), len(s.filled))
 }
 
-func (s state) hash() uint64 {
+func (s State) hash() uint64 {
 	h := fnv.New64()
 	fmt.Fprintf(h, "%v%v", s.r, s.c)
 	for _, m := range s.mined {
@@ -34,7 +35,7 @@ func (s state) hash() uint64 {
 	return h.Sum64()
 }
 
-func (s state) hasMined(pos position) bool {
+func (s State) hasMined(pos position) bool {
 	for _, m := range s.mined {
 		if m.r == pos.r && m.c == pos.c {
 			return true
@@ -43,7 +44,7 @@ func (s state) hasMined(pos position) bool {
 	return false
 }
 
-func (s state) hasFilled(pos position) bool {
+func (s State) hasFilled(pos position) bool {
 	for _, f := range s.filled {
 		if f.r == pos.r && f.c == pos.c {
 			return true
@@ -52,40 +53,41 @@ func (s state) hasFilled(pos position) bool {
 	return false
 }
 
-func (s state) successor(p *puzzle, a action) state {
+// Successor returns the state resulting from action a applied to state s
+func (s State) Successor(p *Puzzle, a Action) State {
 	r, c := s.r, s.c
 	mined, filled := duplicatePositions(s.mined), duplicatePositions(s.filled)
 	switch a {
-	case north:
+	case North:
 		r--
-	case south:
+	case South:
 		r++
-	case east:
+	case East:
 		c++
-	case west:
+	case West:
 		c--
-	case mine:
-		if p.cell[r][c] == minable {
+	case Mine:
+		if p.cell[r][c] == Minable {
 			pos := position{r: r, c: c}
 			if !s.hasMined(pos) {
 				mined = append(mined, pos)
 				sortPositions(mined)
 			}
 		}
-	case fillNorth, fillSouth, fillEast, fillWest:
+	case FillNorth, FillSouth, FillEast, FillWest:
 		fr, fc := r, c
 		switch a {
-		case fillNorth:
+		case FillNorth:
 			fr--
-		case fillSouth:
+		case FillSouth:
 			fr++
-		case fillEast:
+		case FillEast:
 			fc++
-		case fillWest:
+		case FillWest:
 			fc--
 		}
 		if p.isValidCoordinate(fr, fc) &&
-			p.cell[fr][fc] == lava {
+			p.cell[fr][fc] == Lava {
 			fpos := position{r: fr, c: fc}
 			if !s.hasFilled(fpos) {
 				filled = append(filled, fpos)
@@ -97,50 +99,52 @@ func (s state) successor(p *puzzle, a action) state {
 	cell := p.cell[r][c]
 	if p.isValidCoordinate(r, c) &&
 		len(mined) >= len(filled) &&
-		((cell == empty || cell == minable) || (cell == lava && s.hasFilled(pos))) {
-		return state{r: r, c: c, mined: mined, filled: filled}
+		((cell == Empty || cell == Minable) || (cell == Lava && s.hasFilled(pos))) {
+		return State{r: r, c: c, mined: mined, filled: filled}
 	}
 	return s
 }
 
-type action int
+// Action is a possible move in a game state
+type Action int
 
+// Possible actions in the game
 const (
-	north action = iota + 1
-	south
-	east
-	west
-	mine
-	fillNorth
-	fillSouth
-	fillEast
-	fillWest
+	North Action = iota + 1
+	South
+	East
+	West
+	Mine
+	FillNorth
+	FillSouth
+	FillEast
+	FillWest
 )
 
-var allActions = [...]action{
-	north, south, east, west,
-	mine, fillNorth, fillSouth, fillEast, fillWest,
+var allActions = [...]Action{
+	North, South, East, West,
+	Mine, FillNorth, FillSouth, FillEast, FillWest,
 }
 
-func (a action) action() string {
+func (a Action) String() string {
 	switch a {
-	case north:
+	case North:
 		return "⇧"
-	case south:
+	case South:
 		return "⇩"
-	case east:
+	case East:
 		return "⇨"
-	case west:
+	case West:
 		return "⇦"
-	case mine:
+	case Mine:
 		return "◼"
-	case fillNorth:
+	case FillNorth:
 		return "▲"
-	case fillSouth:
+	case FillSouth:
 		return "▼"
-	case fillEast:
+	case FillEast:
 		return "▶"
-	case fillWest:
+	case FillWest:
 		return "◀"
 	default:
 		return "?"

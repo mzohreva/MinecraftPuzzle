@@ -1,4 +1,4 @@
-package main
+package puzzle
 
 import (
 	"container/heap"
@@ -17,20 +17,20 @@ func newMinHeap() minHeap {
 func (h minHeap) len() int      { return h.mh.Len() }
 func (h minHeap) isEmpty() bool { return h.mh.Len() == 0 }
 
-func (h minHeap) push(s state, path []action, cost int) {
+func (h minHeap) push(s State, path []Action, cost int) {
 	node := &minHeapNode{cost: cost, state: s, path: path}
 	heap.Push(h.mh, node)
 }
 
-func (h minHeap) pop() (state, []action) {
+func (h minHeap) pop() (State, []Action) {
 	node := heap.Pop(h.mh).(*minHeapNode)
 	return node.state, node.path
 }
 
 type minHeapNode struct {
 	cost  int
-	state state
-	path  []action
+	state State
+	path  []Action
 	index int
 }
 

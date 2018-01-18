@@ -3,33 +3,19 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/mzohreva/MinecraftPuzzle/puzzle"
 )
 
 func main() {
-	p := readPuzzle(os.Stdin)
-	p.print()
+	p := puzzle.Read(os.Stdin)
+	p.Print()
 
-	s, optimalPath, cost := solveReachGoalProblem(p)
+	s, path, cost := puzzle.SolveReachGoalProblem(p)
 
-	for _, a := range optimalPath {
-		s = s.successor(p, a)
-		fmt.Println(a.action(), s.state())
+	for _, a := range path {
+		s = s.Successor(p, a)
+		fmt.Println(a, s)
 	}
 	fmt.Println("Cost =", cost)
-}
-
-func solveReachGoalProblem(p *puzzle) (state, []action, int) {
-	fmt.Println("Solving Reach Goal Problem")
-	prob := newReachGoalProblem(p)
-	optimalPath := aStarSearch(prob, rgpHeuristic, allActions[:])
-	s := prob.startState()
-	return s, optimalPath, prob.pathCost(optimalPath)
-}
-
-func solveCollectMinablesProblem(p *puzzle) (state, []action, int) {
-	fmt.Println("Solving Collect All Minables Problem")
-	prob := newCollectMinablesProblem(p)
-	optimalPath := aStarSearch(prob, cmpHeuristic, allActions[:])
-	s := prob.startState()
-	return s, optimalPath, prob.pathCost(optimalPath)
 }
