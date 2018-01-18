@@ -9,21 +9,27 @@ func main() {
 	p := readPuzzle(os.Stdin)
 	p.print()
 
-	// rgp := newReachGoalProblem(p)
-	// optimalPath := aStarSearch(rgp, rgpHeuristic, rgActions[:])
-	// s := rgp.startState()
-	// for _, a := range optimalPath {
-	// 	s = rgp.successor(s, a)
-	// 	fmt.Println(a.action(), s.state())
-	// }
-	// fmt.Println("Cost =", rgp.pathCost(optimalPath))
+	s, optimalPath, cost := solveReachGoalProblem(p)
 
-	cmp := newCollectMinablesProblem(p)
-	optimalPath := aStarSearch(cmp, cmpHeuristic, cmActions[:])
-	s := cmp.startState()
 	for _, a := range optimalPath {
-		s = cmp.successor(s, a)
+		s = s.successor(p, a)
 		fmt.Println(a.action(), s.state())
 	}
-	fmt.Println("Cost =", cmp.pathCost(optimalPath))
+	fmt.Println("Cost =", cost)
+}
+
+func solveReachGoalProblem(p *puzzle) (state, []action, int) {
+	fmt.Println("Solving Reach Goal Problem")
+	prob := newReachGoalProblem(p)
+	optimalPath := aStarSearch(prob, rgpHeuristic, allActions[:])
+	s := prob.startState()
+	return s, optimalPath, prob.pathCost(optimalPath)
+}
+
+func solveCollectMinablesProblem(p *puzzle) (state, []action, int) {
+	fmt.Println("Solving Collect All Minables Problem")
+	prob := newCollectMinablesProblem(p)
+	optimalPath := aStarSearch(prob, cmpHeuristic, allActions[:])
+	s := prob.startState()
+	return s, optimalPath, prob.pathCost(optimalPath)
 }

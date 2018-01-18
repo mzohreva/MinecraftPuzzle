@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
 type heuristic func(problem, state) int
@@ -25,7 +24,7 @@ func aStarSearch(pr problem, h heuristic, actions []action) []action {
 		}
 		V[s.hash()] = struct{}{} // Mark as visited
 		for _, a := range actions {
-			n := pr.successor(s, a)
+			n := s.successor(pr.getPuzzle(), a)
 			if _, visited := V[n.hash()]; visited {
 				continue
 			}
@@ -38,14 +37,4 @@ func aStarSearch(pr problem, h heuristic, actions []action) []action {
 	}
 	fmt.Printf("Could not find a path, explored: %v\n", explored)
 	return nil
-}
-
-func abs(x int) int { return int(math.Abs(float64(x))) }
-
-func manhattanDistance(p1, p2 position) int {
-	return manhattanDistance2(p1.r, p1.c, p2.r, p2.c)
-}
-
-func manhattanDistance2(p1r, p1c, p2r, p2c int) int {
-	return abs(p1r-p2r) + abs(p1c-p2c)
 }
