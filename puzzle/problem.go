@@ -15,12 +15,17 @@ type problem interface {
 // State of game
 type State struct {
 	r, c   int
-	mined  []position // position of mined objects
-	filled []position // position of filled lava
+	mined  []Position // position of mined objects
+	filled []Position // position of filled lava
 }
 
 func (s State) String() string {
 	return fmt.Sprintf("{(%v,%v),%v,%v}", s.r, s.c, len(s.mined), len(s.filled))
+}
+
+// Position of the agent
+func (s State) Position() (r, c int) {
+	return s.r, s.c
 }
 
 // Used for map key
@@ -28,26 +33,26 @@ func (s State) rep() string {
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%v%v", s.r, s.c))
 	for _, m := range s.mined {
-		buf.WriteString(fmt.Sprintf("%v%v", m.r, m.c))
+		buf.WriteString(fmt.Sprintf("%v%v", m.R, m.C))
 	}
 	for _, f := range s.filled {
-		buf.WriteString(fmt.Sprintf("%v%v", f.r, f.c))
+		buf.WriteString(fmt.Sprintf("%v%v", f.R, f.C))
 	}
 	return buf.String()
 }
 
-func (s State) hasMined(pos position) bool {
+func (s State) HasMined(pos Position) bool {
 	for _, m := range s.mined {
-		if m.r == pos.r && m.c == pos.c {
+		if m.R == pos.R && m.C == pos.C {
 			return true
 		}
 	}
 	return false
 }
 
-func (s State) hasFilled(pos position) bool {
+func (s State) HasFilled(pos Position) bool {
 	for _, f := range s.filled {
-		if f.r == pos.r && f.c == pos.c {
+		if f.R == pos.R && f.C == pos.C {
 			return true
 		}
 	}
@@ -69,8 +74,8 @@ func (s State) Successor(p *Puzzle, a Action) State {
 		c--
 	case Mine:
 		if p.cell[r][c] == Minable {
-			pos := position{r: r, c: c}
-			if !s.hasMined(pos) {
+			pos := Position{R: r, C: c}
+			if !s.HasMined(pos) {
 				mined = append(mined, pos)
 				sortPositions(mined)
 			}
@@ -89,18 +94,18 @@ func (s State) Successor(p *Puzzle, a Action) State {
 		}
 		if p.isValidCoordinate(fr, fc) &&
 			p.cell[fr][fc] == Lava {
-			fpos := position{r: fr, c: fc}
-			if !s.hasFilled(fpos) {
+			fpos := Position{R: fr, C: fc}
+			if !s.HasFilled(fpos) {
 				filled = append(filled, fpos)
 				sortPositions(filled)
 			}
 		}
 	}
-	pos := position{r: r, c: c}
+	pos := Position{R: r, C: c}
 	cell := p.cell[r][c]
 	if p.isValidCoordinate(r, c) &&
 		len(mined) >= len(filled) &&
-		((cell == Empty || cell == Minable) || (cell == Lava && s.hasFilled(pos))) {
+		((cell == Empty || cell == Minable) || (cell == Lava && s.HasFilled(pos))) {
 		return State{r: r, c: c, mined: mined, filled: filled}
 	}
 	return s

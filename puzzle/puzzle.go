@@ -58,12 +58,39 @@ func Read(input io.Reader) *Puzzle {
 	return &Puzzle{cell: cell, sr: sr, sc: sc, gr: gr, gc: gc}
 }
 
-func (p *Puzzle) width() int {
+// Width of the puzzle grid
+func (p *Puzzle) Width() int {
 	return len(p.cell[0])
 }
 
-func (p *Puzzle) height() int {
+// Height of the puzzle grid
+func (p *Puzzle) Height() int {
 	return len(p.cell)
+}
+
+// Cell type at position (r, c)
+func (p *Puzzle) Cell(r, c int) CellType {
+	return p.cell[r][c]
+}
+
+// IsStartPosition returns true if (r, c) is the start position
+func (p *Puzzle) IsStartPosition(r, c int) bool {
+	return p.sr == r && p.sc == c
+}
+
+// IsGoalPosition returns true if (r, c) is the goal position
+func (p *Puzzle) IsGoalPosition(r, c int) bool {
+	return p.gr == r && p.gc == c
+}
+
+// Goal returns the position of goal
+func (p *Puzzle) Goal() (r, c int) {
+	return p.gr, p.gc
+}
+
+// Start returns the position of goal
+func (p *Puzzle) Start() (r, c int) {
+	return p.sr, p.sc
 }
 
 func (p *Puzzle) count(t CellType) int {
@@ -78,12 +105,12 @@ func (p *Puzzle) count(t CellType) int {
 	return count
 }
 
-func (p *Puzzle) cellsOfType(t CellType) []position {
-	var list []position
+func (p *Puzzle) cellsOfType(t CellType) []Position {
+	var list []Position
 	for r := range p.cell {
 		for c := range p.cell[r] {
 			if p.cell[r][c] == t {
-				list = append(list, position{r: r, c: c})
+				list = append(list, Position{R: r, C: c})
 			}
 		}
 	}
@@ -91,7 +118,7 @@ func (p *Puzzle) cellsOfType(t CellType) []position {
 }
 
 func (p *Puzzle) isValidCoordinate(r, c int) bool {
-	return r >= 0 && r < p.height() && c >= 0 && c < p.width()
+	return r >= 0 && r < p.Height() && c >= 0 && c < p.Width()
 }
 
 // Print puzzle on stdout
@@ -137,19 +164,20 @@ func SolveCollectMinablesProblem(p *Puzzle) (State, []Action, int) {
 	return s, optimalPath, prob.pathCost(optimalPath)
 }
 
-type position struct{ r, c int }
+// Position is a (row, column) pair
+type Position struct{ R, C int }
 
-func sortPositions(s []position) {
+func sortPositions(s []Position) {
 	sort.Slice(s, func(i, j int) bool {
-		if s[i].r == s[j].r {
-			return s[i].c < s[j].c
+		if s[i].R == s[j].R {
+			return s[i].C < s[j].C
 		}
-		return s[i].r < s[j].r
+		return s[i].R < s[j].R
 	})
 }
 
-func duplicatePositions(s []position) []position {
-	c := make([]position, len(s))
+func duplicatePositions(s []Position) []Position {
+	c := make([]Position, len(s))
 	copy(c, s)
 	return c
 }

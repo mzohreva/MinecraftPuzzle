@@ -23,12 +23,12 @@ func (p cmProblem) pathCost(path []Action) int {
 }
 
 func cmpHeuristic(pr problem, s State) int {
-	pos := position{r: s.r, c: s.c}
-	goal := position{r: pr.getPuzzle().gr, c: pr.getPuzzle().gc}
+	pos := Position{R: s.r, C: s.c}
+	goal := Position{R: pr.getPuzzle().gr, C: pr.getPuzzle().gc}
 
-	var minables []position
+	var minables []Position
 	for _, m := range pr.getPuzzle().cellsOfType(Minable) {
-		if !s.hasMined(m) {
+		if !s.HasMined(m) {
 			minables = append(minables, m)
 		}
 	}

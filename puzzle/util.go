@@ -11,8 +11,8 @@ func min(x, y int) int {
 	return y
 }
 
-func manhattanDistance(p1, p2 position) int {
-	return manhattanDistance2(p1.r, p1.c, p2.r, p2.c)
+func manhattanDistance(p1, p2 Position) int {
+	return manhattanDistance2(p1.R, p1.C, p2.R, p2.C)
 }
 
 func manhattanDistance2(p1r, p1c, p2r, p2c int) int {
