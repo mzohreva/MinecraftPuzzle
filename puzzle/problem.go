@@ -1,8 +1,8 @@
 package puzzle
 
 import (
+	"bytes"
 	"fmt"
-	"hash/fnv"
 )
 
 type problem interface {
@@ -23,16 +23,17 @@ func (s State) String() string {
 	return fmt.Sprintf("{(%v,%v),%v,%v}", s.r, s.c, len(s.mined), len(s.filled))
 }
 
-func (s State) hash() uint64 {
-	h := fnv.New64()
-	fmt.Fprintf(h, "%v%v", s.r, s.c)
+// Used for map key
+func (s State) rep() string {
+	var buf bytes.Buffer
+	buf.WriteString(fmt.Sprintf("%v%v", s.r, s.c))
 	for _, m := range s.mined {
-		fmt.Fprintf(h, "%v%v", m.r, m.c)
+		buf.WriteString(fmt.Sprintf("%v%v", m.r, m.c))
 	}
 	for _, f := range s.filled {
-		fmt.Fprintf(h, "%v%v", f.r, f.c)
+		buf.WriteString(fmt.Sprintf("%v%v", f.r, f.c))
 	}
-	return h.Sum64()
+	return buf.String()
 }
 
 func (s State) hasMined(pos position) bool {

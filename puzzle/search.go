@@ -10,7 +10,7 @@ func aStarSearch(pr problem, h heuristic, actions []Action) []Action {
 	start := pr.startState()
 	Q := newMinHeap()
 	Q.push(start, nil, h(pr, start))
-	V := make(map[uint64]struct{})
+	V := make(map[string]struct{})
 	explored := 0
 	for !Q.isEmpty() {
 		s, path := Q.pop()
@@ -19,13 +19,13 @@ func aStarSearch(pr problem, h heuristic, actions []Action) []Action {
 			fmt.Printf("explored: %v\n", explored)
 			return path
 		}
-		if _, visited := V[s.hash()]; visited {
+		if _, visited := V[s.rep()]; visited {
 			continue
 		}
-		V[s.hash()] = struct{}{} // Mark as visited
+		V[s.rep()] = struct{}{} // Mark as visited
 		for _, a := range actions {
 			n := s.Successor(pr.getPuzzle(), a)
-			if _, visited := V[n.hash()]; visited {
+			if _, visited := V[n.rep()]; visited {
 				continue
 			}
 			newPath := make([]Action, len(path), len(path)+1)
