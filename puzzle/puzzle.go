@@ -3,6 +3,7 @@ package puzzle
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"sort"
 )
 
@@ -146,11 +147,25 @@ func (p *Puzzle) Print() {
 	}
 }
 
+func shuffledActions() []Action {
+	n := len(allActions)
+	list := make([]Action, 0, n)
+	for _, r := range rand.Perm(n) {
+		list = append(list, allActions[r])
+	}
+	fmt.Print("Actions: ")
+	for _, a := range list {
+		fmt.Print(a, " ")
+	}
+	fmt.Println()
+	return list
+}
+
 // SolveReachGoalProblem solves the "Reach Goal" problem
 func SolveReachGoalProblem(p *Puzzle) (State, []Action, int) {
 	fmt.Println("Solving Reach Goal Problem")
 	prob := newReachGoalProblem(p)
-	optimalPath := aStarSearch(prob, rgpHeuristic, allActions[:])
+	optimalPath := aStarSearch(prob, rgpHeuristic, shuffledActions())
 	s := prob.startState()
 	return s, optimalPath, prob.pathCost(optimalPath)
 }
@@ -159,7 +174,7 @@ func SolveReachGoalProblem(p *Puzzle) (State, []Action, int) {
 func SolveCollectMinablesProblem(p *Puzzle) (State, []Action, int) {
 	fmt.Println("Solving Collect All Minables Problem")
 	prob := newCollectMinablesProblem(p)
-	optimalPath := aStarSearch(prob, cmpHeuristic, allActions[:])
+	optimalPath := aStarSearch(prob, cmpHeuristic, shuffledActions())
 	s := prob.startState()
 	return s, optimalPath, prob.pathCost(optimalPath)
 }
