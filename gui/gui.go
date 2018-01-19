@@ -96,10 +96,6 @@ func (sol solution) show(events <-chan sdl.Event) <-chan error {
 	go func() {
 		defer close(errc)
 
-		// There is a race condition between call to
-		// CreateWindowAndRenderer() and WaitEvent()
-		time.Sleep(time.Second)
-
 		width := int32(36 * sol.p.Width())
 		height := int32(36 * sol.p.Height())
 		w, r, err := sdl.CreateWindowAndRenderer(width, height, sdl.WINDOW_SHOWN)
@@ -112,28 +108,31 @@ func (sol solution) show(events <-chan sdl.Event) <-chan error {
 		if err != nil {
 			errc <- err
 		}
-
 		if err := g.paint(r); err != nil {
 			errc <- err
 		}
 
-		s := sol.start
-		for _, a := range sol.path {
-			time.Sleep(250 * time.Millisecond)
-			s = s.Successor(sol.p, a)
-			g.state = s
-			if err := g.paint(r); err != nil {
-				errc <- err
-			}
-		}
-		fmt.Println("Waiting for SDL events...")
-		done := false
+		tick := time.Tick(1000 * time.Millisecond)
+		s, i, done := sol.start, 0, false
 		for !done {
-			e := <-events
-			switch e.(type) {
-			case *sdl.QuitEvent:
-				fmt.Println("Done")
-				done = true
+			select {
+
+			case e := <-events:
+				switch e.(type) {
+				case *sdl.QuitEvent:
+					fmt.Println("Done")
+					done = true
+				}
+
+			case <-tick:
+				if i < len(sol.path) {
+					s = s.Successor(sol.p, sol.path[i])
+					g.state = s
+					if err := g.paint(r); err != nil {
+						errc <- err
+					}
+					i++
+				}
 			}
 		}
 	}()
@@ -143,7 +142,7 @@ func (sol solution) show(events <-chan sdl.Event) <-chan error {
 
 // Run draws a puzzle using SDL-2
 func Run(p *puzzle.Puzzle, start puzzle.State, path []puzzle.Action) error {
-	err := sdl.Init(sdl.INIT_EVERYTHING)
+	err := sdl.Init(sdl.INIT_VIDEO)
 	if err != nil {
 		return err
 	}
