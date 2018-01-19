@@ -1,0 +1,23 @@
+20 20
+1 1
+18 18
+********************
+*   M  L  L  L  L  *
+* M   L  L    L    *
+*   L       L      *
+*  L   L        L  *
+* L   L  L         *
+* L    L   L   L   *
+*    L  L L L L L  *
+*     L    L   L   *
+*  L      L        *
+*LLLLL  L L L L    *
+* LLL     L    L   *
+*      LL LL    L  *
+* LLLL   L   LL  L *
+*  L L LL LL    L  *
+*L L L   L   L     *
+*  LLL  L L     LLL*
+*      L   L    LLL*
+*  L   L   L    LL *
+********************

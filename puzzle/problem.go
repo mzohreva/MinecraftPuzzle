@@ -31,12 +31,12 @@ func (s State) Position() (r, c int) {
 // Used for map key
 func (s State) rep() string {
 	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("%v%v", s.r, s.c))
+	buf.WriteString(fmt.Sprintf("%v,%v,", s.r, s.c))
 	for _, m := range s.mined {
-		buf.WriteString(fmt.Sprintf("%v%v", m.R, m.C))
+		buf.WriteString(fmt.Sprintf("%v,%v,", m.R, m.C))
 	}
 	for _, f := range s.filled {
-		buf.WriteString(fmt.Sprintf("%v%v", f.R, f.C))
+		buf.WriteString(fmt.Sprintf("%v,%v,", f.R, f.C))
 	}
 	return buf.String()
 }
