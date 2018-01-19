@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"fmt"
 	"runtime"
 	"time"
 
@@ -16,7 +17,7 @@ type grid struct {
 	state        puzzle.State
 }
 
-func newGrid(p *puzzle.Puzzle, start puzzle.State, r *sdl.Renderer) (*grid, error) {
+func newGrid(p *puzzle.Puzzle, s puzzle.State, r *sdl.Renderer) (*grid, error) {
 	startTexture, err := img.LoadTexture(r, "res/start.png")
 	if err != nil {
 		return nil, err
@@ -25,10 +26,17 @@ func newGrid(p *puzzle.Puzzle, start puzzle.State, r *sdl.Renderer) (*grid, erro
 	if err != nil {
 		return nil, err
 	}
-	return &grid{puzzle: p, startTexture: startTexture, goalTexture: goalTexture, state: start}, nil
+	return &grid{
+		puzzle:       p,
+		startTexture: startTexture,
+		goalTexture:  goalTexture,
+		state:        s}, nil
 }
 
 func (g *grid) paint(renderer *sdl.Renderer) error {
+	if err := renderer.Clear(); err != nil {
+		return err
+	}
 	w, h, err := renderer.GetOutputSize()
 	if err != nil {
 		return err
@@ -72,56 +80,88 @@ func (g *grid) paint(renderer *sdl.Renderer) error {
 			renderer.DrawRect(rect)
 		}
 	}
+	renderer.Present()
 	return nil
 }
 
-// DrawPuzzle draws a puzzle using SDL-2
-func DrawPuzzle(p *puzzle.Puzzle, start puzzle.State, path []puzzle.Action) error {
-	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+type solution struct {
+	p     *puzzle.Puzzle
+	start puzzle.State
+	path  []puzzle.Action
+}
+
+func (sol solution) show(events <-chan sdl.Event) <-chan error {
+	errc := make(chan error)
+
+	go func() {
+		defer close(errc)
+
+		// There is a race condition between call to
+		// CreateWindowAndRenderer() and WaitEvent()
+		time.Sleep(time.Second)
+
+		width := int32(36 * sol.p.Width())
+		height := int32(36 * sol.p.Height())
+		w, r, err := sdl.CreateWindowAndRenderer(width, height, sdl.WINDOW_SHOWN)
+		if err != nil {
+			errc <- err
+		}
+		defer w.Destroy()
+
+		g, err := newGrid(sol.p, sol.start, r)
+		if err != nil {
+			errc <- err
+		}
+
+		if err := g.paint(r); err != nil {
+			errc <- err
+		}
+
+		s := sol.start
+		for _, a := range sol.path {
+			time.Sleep(250 * time.Millisecond)
+			s = s.Successor(sol.p, a)
+			g.state = s
+			if err := g.paint(r); err != nil {
+				errc <- err
+			}
+		}
+		fmt.Println("Waiting for SDL events...")
+		done := false
+		for !done {
+			e := <-events
+			switch e.(type) {
+			case *sdl.QuitEvent:
+				fmt.Println("Done")
+				done = true
+			}
+		}
+	}()
+
+	return errc
+}
+
+// Run draws a puzzle using SDL-2
+func Run(p *puzzle.Puzzle, start puzzle.State, path []puzzle.Action) error {
+	err := sdl.Init(sdl.INIT_EVERYTHING)
+	if err != nil {
 		return err
 	}
 	defer sdl.Quit()
 
-	w, r, err := sdl.CreateWindowAndRenderer(int32(36*p.Width()), int32(36*p.Height()), sdl.WINDOW_SHOWN)
-	if err != nil {
-		return err
-	}
-	defer w.Destroy()
-
 	// Improve anti-aliasing
 	sdl.SetHint(sdl.HINT_RENDER_SCALE_QUALITY, "1")
 
-	g, err := newGrid(p, start, r)
-	if err != nil {
-		return err
-	}
-
-	r.Clear()
-	if err := g.paint(r); err != nil {
-		return err
-	}
-	r.Present()
-
-	go func() {
-		s := start
-		for _, a := range path {
-			time.Sleep(200 * time.Millisecond)
-			s = s.Successor(p, a)
-			g.state = s
-			r.Clear()
-			g.paint(r)
-			r.Present()
-		}
-	}()
+	events := make(chan sdl.Event)
+	sol := solution{p: p, start: start, path: path}
+	errc := sol.show(events)
 
 	runtime.LockOSThread()
-	done := false
-	for !done {
-		event := sdl.WaitEvent()
-		switch event.(type) {
-		case *sdl.QuitEvent:
-			done = true
+	for {
+		select {
+		case events <- sdl.WaitEvent():
+		case err := <-errc:
+			return err
 		}
 	}
-	return nil
 }

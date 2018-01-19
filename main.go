@@ -25,7 +25,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("Cost =", cost)
 
-	if err := gui.DrawPuzzle(p, start, path); err != nil {
+	if err := gui.Run(p, start, path); err != nil {
 		fmt.Println(err)
 	}
 }
