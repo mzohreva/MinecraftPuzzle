@@ -24,8 +24,8 @@ func (d *designer) run(events <-chan sdl.Event) <-chan error {
 	go func() {
 		defer close(errc)
 
-		width := int32(36 * d.width)
-		height := int32(36 * d.height)
+		width := int32(cellWidth * d.width)
+		height := int32(cellHeight * d.height)
 		w, r, err := sdl.CreateWindowAndRenderer(width, height, sdl.WINDOW_SHOWN)
 		reportError(err)
 		defer w.Destroy()
@@ -52,7 +52,7 @@ func (d *designer) run(events <-chan sdl.Event) <-chan error {
 					done = true
 				case *sdl.MouseButtonEvent:
 					if event.State == sdl.RELEASED {
-						col, row := int(event.X/36), int(event.Y/36)
+						col, row := int(event.X/cellWidth), int(event.Y/cellHeight)
 						t := d.puzzle.Cell(row, col)
 						d.puzzle.SetCell(row, col, nextCellType(t))
 						reportError(g.paint(r))

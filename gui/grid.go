@@ -7,14 +7,23 @@ import (
 )
 
 type grid struct {
-	puzzle       *puzzle.Puzzle
-	startTexture *sdl.Texture
-	goalTexture  *sdl.Texture
-	state        *puzzle.State
+	puzzle         *puzzle.Puzzle
+	playerTextures []*sdl.Texture
+	goalTexture    *sdl.Texture
+	state          *puzzle.State
+	sad            bool
 }
 
 func newGrid(p *puzzle.Puzzle, s *puzzle.State, r *sdl.Renderer) (*grid, error) {
-	startTexture, err := img.LoadTexture(r, "res/start.png")
+	neutral, err := img.LoadTexture(r, "res/player-neutral.png")
+	if err != nil {
+		return nil, err
+	}
+	happy, err := img.LoadTexture(r, "res/player-happy.png")
+	if err != nil {
+		return nil, err
+	}
+	sad, err := img.LoadTexture(r, "res/player-sad.png")
 	if err != nil {
 		return nil, err
 	}
@@ -22,11 +31,15 @@ func newGrid(p *puzzle.Puzzle, s *puzzle.State, r *sdl.Renderer) (*grid, error) 
 	if err != nil {
 		return nil, err
 	}
+	playerTextures := make([]*sdl.Texture, 3)
+	playerTextures[0] = neutral
+	playerTextures[1] = happy
+	playerTextures[2] = sad
 	return &grid{
-		puzzle:       p,
-		startTexture: startTexture,
-		goalTexture:  goalTexture,
-		state:        s}, nil
+		puzzle:         p,
+		playerTextures: playerTextures,
+		goalTexture:    goalTexture,
+		state:          s}, nil
 }
 
 func (g *grid) paint(renderer *sdl.Renderer) error {
@@ -68,9 +81,14 @@ func (g *grid) paint(renderer *sdl.Renderer) error {
 				Y: int32(padding + r*sr),
 				H: int32(sr),
 				W: int32(sc)}
+			imgRect := &sdl.Rect{
+				X: rect.X + 2,
+				Y: rect.Y + 2,
+				H: rect.H - 4,
+				W: rect.W - 4}
 			renderer.FillRect(rect)
 			if g.puzzle.IsGoalPosition(r, c) {
-				renderer.Copy(g.goalTexture, nil, rect)
+				renderer.Copy(g.goalTexture, nil, imgRect)
 			}
 			if g.puzzle.IsStartPosition(r, c) {
 				renderer.SetDrawColor(50, 50, 100, 255)
@@ -83,7 +101,13 @@ func (g *grid) paint(renderer *sdl.Renderer) error {
 			if g.state != nil {
 				cr, cc := g.state.Position()
 				if r == cr && c == cc {
-					renderer.Copy(g.startTexture, nil, rect)
+					if g.sad {
+						renderer.Copy(g.playerTextures[2], nil, imgRect)
+					} else if g.puzzle.IsGoalPosition(r, c) {
+						renderer.Copy(g.playerTextures[1], nil, imgRect)
+					} else {
+						renderer.Copy(g.playerTextures[0], nil, imgRect)
+					}
 				}
 			}
 			renderer.SetDrawColor(70, 70, 70, 255)

@@ -21,8 +21,8 @@ func (sol solution) run(events <-chan sdl.Event) <-chan error {
 		defer close(errc)
 
 		p := sol.Problem.GetPuzzle()
-		width := int32(36 * p.Width())
-		height := int32(36 * p.Height())
+		width := int32(cellWidth * p.Width())
+		height := int32(cellHeight * p.Height())
 		w, r, err := sdl.CreateWindowAndRenderer(width, height, sdl.WINDOW_SHOWN)
 		reportError(err)
 		defer w.Destroy()
@@ -38,6 +38,9 @@ func (sol solution) run(events <-chan sdl.Event) <-chan error {
 		start := puzzle.Solution(sol).Start()
 		g, err := newGrid(p, &start, r)
 		reportError(err)
+		if len(sol.Path) == 0 {
+			g.sad = true
+		}
 		reportError(g.paint(r))
 
 		tick := time.Tick(250 * time.Millisecond)

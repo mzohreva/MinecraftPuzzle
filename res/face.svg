@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.5398569"
-     inkscape:cx="115.2943"
-     inkscape:cy="561.25984"
+     inkscape:cx="190.73516"
+     inkscape:cy="565.89069"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -55,7 +55,7 @@
      id="layer1">
     <path
        sodipodi:type="star"
-       style="fill:#ff00ff;stroke-width:1.6780828;stroke-miterlimit:4;stroke-dasharray:none;stroke:#464646;stroke-opacity:1"
+       style="fill:#ff00ff;stroke-width:6.7123312;stroke-miterlimit:4;stroke-dasharray:none;stroke:#46182e;stroke-opacity:1"
        id="path1375"
        sodipodi:sides="5"
        sodipodi:cx="80.376236"
@@ -71,47 +71,162 @@
        inkscape:transform-center-x="0.65888152"
        inkscape:transform-center-y="-2.1094466"
        transform="matrix(0.58224515,0,0,0.60991224,13.792344,90.646596)"
-       inkscape:export-xdpi="121.45529"
-       inkscape:export-ydpi="121.45529" />
+       inkscape:export-xdpi="25.77"
+       inkscape:export-ydpi="25.77"
+       inkscape:export-filename="/Users/mohsen/go_mzohreva/MinecraftPuzzle/res/goal.png" />
     <g
-       id="g56"
+       id="g169"
        inkscape:export-xdpi="126.99999"
        inkscape:export-ydpi="126.99999">
       <g
+         transform="translate(-41.658416,-59.740096)"
          inkscape:export-ydpi="126.99999"
          inkscape:export-xdpi="126.99999"
-         id="g45">
-        <circle
-           style="fill:#ffcc00;stroke-width:0.55420566;stroke-miterlimit:4;stroke-dasharray:none"
-           id="path10"
-           cx="78.411491"
-           cy="97.425735"
-           r="30" />
-        <circle
-           style="fill:#000000;stroke-width:0.0923676;stroke-miterlimit:4;stroke-dasharray:none"
-           id="path10-3"
-           cx="88.105156"
-           cy="88.712875"
-           r="5" />
-        <circle
-           style="fill:#000000;stroke-width:0.0923676;stroke-miterlimit:4;stroke-dasharray:none"
-           id="path10-3-2"
-           cx="68.717819"
-           cy="88.712875"
-           r="5" />
+         id="g56">
+        <g
+           id="g45"
+           inkscape:export-xdpi="126.99999"
+           inkscape:export-ydpi="126.99999">
+          <circle
+             r="30"
+             cy="97.425735"
+             cx="78.411491"
+             id="path10"
+             style="fill:#ffcc00;stroke-width:0.55420566;stroke-miterlimit:4;stroke-dasharray:none" />
+          <circle
+             r="5"
+             cy="88.712875"
+             cx="88.105156"
+             id="path10-3"
+             style="fill:#000000;stroke-width:0.0923676;stroke-miterlimit:4;stroke-dasharray:none" />
+          <circle
+             r="5"
+             cy="88.712875"
+             cx="68.717819"
+             id="path10-3-2"
+             style="fill:#000000;stroke-width:0.0923676;stroke-miterlimit:4;stroke-dasharray:none" />
+        </g>
+        <path
+           style="fill:#000000;stroke-width:0.57098997;stroke-miterlimit:4;stroke-dasharray:none"
+           id="path49"
+           sodipodi:type="arc"
+           sodipodi:cx="78.411491"
+           sodipodi:cy="106.90105"
+           sodipodi:rx="15.193069"
+           sodipodi:ry="3.9207921"
+           sodipodi:start="0"
+           sodipodi:end="3.1415927"
+           d="m 93.604561,106.90105 a 15.193069,3.9207921 0 0 1 -7.596535,3.3955 15.193069,3.9207921 0 0 1 -15.19307,0 15.193069,3.9207921 0 0 1 -7.596534,-3.3955"
+           sodipodi:open="true" />
       </g>
+    </g>
+    <g
+       id="g45-9"
+       inkscape:export-xdpi="126.99999"
+       inkscape:export-ydpi="126.99999"
+       transform="translate(88.712271,-58.707915)" />
+    <g
+       id="g161"
+       inkscape:export-xdpi="126.99999"
+       inkscape:export-ydpi="126.99999">
+      <circle
+         style="fill:#ffcc00;stroke-width:0.55420566;stroke-miterlimit:4;stroke-dasharray:none"
+         id="path10-38"
+         cx="105.36912"
+         cy="37.685638"
+         r="30" />
+      <circle
+         style="fill:#000000;stroke-width:0.0923676;stroke-miterlimit:4;stroke-dasharray:none"
+         id="path10-3-0"
+         cx="115.06278"
+         cy="28.97278"
+         r="5" />
+      <circle
+         style="fill:#000000;stroke-width:0.0923676;stroke-miterlimit:4;stroke-dasharray:none"
+         id="path10-3-2-2"
+         cx="95.675446"
+         cy="28.97278"
+         r="5" />
       <path
          sodipodi:open="true"
-         d="m 93.604561,106.90105 a 15.193069,3.9207921 0 0 1 -7.596535,3.3955 15.193069,3.9207921 0 0 1 -15.19307,0 15.193069,3.9207921 0 0 1 -7.596534,-3.3955"
+         d="m 120.56219,41.279762 a 15.193069,14.70297 0 0 1 -7.59654,12.733146 15.193069,14.70297 0 0 1 -15.193067,-1e-6 15.193069,14.70297 0 0 1 -7.596535,-12.733145"
          sodipodi:end="3.1415927"
          sodipodi:start="0"
-         sodipodi:ry="3.9207921"
+         sodipodi:ry="14.70297"
          sodipodi:rx="15.193069"
-         sodipodi:cy="106.90105"
-         sodipodi:cx="78.411491"
+         sodipodi:cy="41.279762"
+         sodipodi:cx="105.36912"
          sodipodi:type="arc"
-         id="path49"
-         style="fill:#000000;stroke-width:0.57098997;stroke-miterlimit:4;stroke-dasharray:none" />
+         id="path49-4"
+         style="fill:#000000;stroke-width:1.1057173;stroke-miterlimit:4;stroke-dasharray:none" />
     </g>
+    <g
+       id="g155"
+       inkscape:export-filename="/Users/mohsen/go_mzohreva/MinecraftPuzzle/res/player-sad.png"
+       inkscape:export-xdpi="127"
+       inkscape:export-ydpi="127">
+      <g
+         id="g90-8"
+         transform="translate(95.573658,-59.740096)">
+        <circle
+           r="30"
+           cy="97.425735"
+           cx="78.411491"
+           id="path10-38-3"
+           style="fill:#ffcc00;stroke-width:0.55420566;stroke-miterlimit:4;stroke-dasharray:none" />
+        <circle
+           r="5"
+           cy="88.712875"
+           cx="88.105156"
+           id="path10-3-0-9"
+           style="fill:#000000;stroke-width:0.0923676;stroke-miterlimit:4;stroke-dasharray:none" />
+        <circle
+           r="5"
+           cy="88.712875"
+           cx="68.717819"
+           id="path10-3-2-2-0"
+           style="fill:#000000;stroke-width:0.0923676;stroke-miterlimit:4;stroke-dasharray:none" />
+        <path
+           transform="scale(1,-1)"
+           style="fill:#000000;stroke-width:0.92510939;stroke-miterlimit:4;stroke-dasharray:none"
+           id="path49-4-5"
+           sodipodi:type="arc"
+           sodipodi:cx="78.411491"
+           sodipodi:cy="-115.72283"
+           sodipodi:rx="15.193069"
+           sodipodi:ry="10.292079"
+           sodipodi:start="0"
+           sodipodi:end="3.1415927"
+           d="m 93.604561,-115.72283 a 15.193069,10.292079 0 0 1 -7.596535,8.9132 15.193069,10.292079 0 0 1 -15.19307,0 15.193069,10.292079 0 0 1 -7.596534,-8.9132"
+           sodipodi:open="true" />
+        <path
+           transform="scale(1,-1)"
+           style="fill:#ffcc00;stroke-width:0.90281433;stroke-miterlimit:4;stroke-dasharray:none"
+           id="path49-4-5-2"
+           sodipodi:type="arc"
+           sodipodi:cx="78.294289"
+           sodipodi:cy="-119.90506"
+           sodipodi:rx="15.193069"
+           sodipodi:ry="9.80198"
+           sodipodi:start="0"
+           sodipodi:end="3.1415927"
+           d="m 93.487358,-119.90506 a 15.193069,9.80198 0 0 1 -7.596535,8.48876 15.193069,9.80198 0 0 1 -15.19307,0 15.193069,9.80198 0 0 1 -7.596534,-8.48876"
+           sodipodi:open="true" />
+      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:50.8px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332;"
+       x="120.56435"
+       y="145.5594"
+       id="text144"
+       inkscape:export-filename="/Users/mohsen/go_mzohreva/MinecraftPuzzle/res/goal.png"
+       inkscape:export-xdpi="121.455"
+       inkscape:export-ydpi="121.455"><tspan
+         sodipodi:role="line"
+         id="tspan142"
+         x="120.56435"
+         y="145.5594"
+         style="stroke-width:0.26458332;font-size:50.79999999999999716px;-inkscape-font-specification:'PT Sans Caption Bold';font-family:'PT Sans Caption';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">G</tspan></text>
   </g>
 </svg>

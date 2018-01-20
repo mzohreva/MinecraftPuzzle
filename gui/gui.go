@@ -6,6 +6,11 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
+const (
+	cellHeight = 40
+	cellWidth  = 40
+)
+
 type runner interface {
 	run(<-chan sdl.Event) <-chan error
 }
