@@ -15,16 +15,27 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	var edit, nosolve bool
+	const (
+		defaultWidth  = 10
+		defaultHeight = 10
+	)
+
+	var edit, nosolve, help bool
 	var height, width int
 	var inputFile, outputFile string
-	flag.BoolVar(&edit, "edit", false, "Design new puzzle or edit the input puzzle")
-	flag.BoolVar(&nosolve, "nosolve", false, "Don't solve the puzzle")
-	flag.IntVar(&width, "width", 20, "Puzzle width")
-	flag.IntVar(&height, "height", 20, "Puzzle height")
-	flag.StringVar(&inputFile, "input", "", "Puzzle input file")
-	flag.StringVar(&outputFile, "output", "", "Puzzle output file. Defaults to stdout")
+	flag.BoolVar(&help, "help", false, "Show usage")
+	flag.BoolVar(&edit, "e", false, "Design new puzzle or edit the input puzzle")
+	flag.BoolVar(&nosolve, "n", false, "Don't solve the puzzle")
+	flag.IntVar(&width, "w", defaultWidth, "Puzzle width")
+	flag.IntVar(&height, "h", defaultHeight, "Puzzle height")
+	flag.StringVar(&inputFile, "i", "", "Puzzle input file")
+	flag.StringVar(&outputFile, "o", "", "Puzzle output file. Defaults to stdout")
 	flag.Parse()
+
+	if help {
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	var p *puzzle.Puzzle
 
