@@ -16,20 +16,10 @@ func main() {
 	p := puzzle.Read(os.Stdin)
 	p.Print()
 
-	start, path, cost := puzzle.SolveReachGoalProblem(p)
+	solution := puzzle.SolveReachGoalProblem(p)
+	solution.Print(os.Stdout)
 
-	s := start
-	for i, a := range path {
-		s = s.Successor(p, a)
-		fmt.Printf("%v ", a)
-		if i%10 == 9 {
-			fmt.Println()
-		}
-	}
-	fmt.Println()
-	fmt.Println("Cost =", cost)
-
-	if err := gui.Run(p, start, path); err != nil {
+	if err := gui.Run(solution); err != nil {
 		fmt.Println(err)
 	}
 }

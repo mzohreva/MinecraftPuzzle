@@ -3,8 +3,6 @@ package puzzle
 import (
 	"fmt"
 	"io"
-	"math/rand"
-	"sort"
 )
 
 // CellType is the type of cells in the puzzle
@@ -38,9 +36,9 @@ func Read(input io.Reader) *Puzzle {
 			var char byte
 			fmt.Fscanf(input, "%c", &char)
 			switch char {
-			case '*':
+			case '*', 'W':
 				cell[r][c] = Wall
-			case ' ':
+			case ' ', '.':
 				cell[r][c] = Empty
 			case 'M':
 				cell[r][c] = Minable
@@ -74,24 +72,9 @@ func (p *Puzzle) Cell(r, c int) CellType {
 	return p.cell[r][c]
 }
 
-// IsStartPosition returns true if (r, c) is the start position
-func (p *Puzzle) IsStartPosition(r, c int) bool {
-	return p.sr == r && p.sc == c
-}
-
 // IsGoalPosition returns true if (r, c) is the goal position
 func (p *Puzzle) IsGoalPosition(r, c int) bool {
 	return p.gr == r && p.gc == c
-}
-
-// Goal returns the position of goal
-func (p *Puzzle) Goal() (r, c int) {
-	return p.gr, p.gc
-}
-
-// Start returns the position of goal
-func (p *Puzzle) Start() (r, c int) {
-	return p.sr, p.sc
 }
 
 func (p *Puzzle) count(t CellType) int {
@@ -145,54 +128,4 @@ func (p *Puzzle) Print() {
 		}
 		fmt.Println()
 	}
-}
-
-func shuffledActions() []Action {
-	n := len(allActions)
-	list := make([]Action, 0, n)
-	for _, r := range rand.Perm(n) {
-		list = append(list, allActions[r])
-	}
-	fmt.Print("Actions: ")
-	for _, a := range list {
-		fmt.Print(a, " ")
-	}
-	fmt.Println()
-	return list
-}
-
-// SolveReachGoalProblem solves the "Reach Goal" problem
-func SolveReachGoalProblem(p *Puzzle) (State, []Action, int) {
-	fmt.Println("Solving Reach Goal Problem")
-	prob := newReachGoalProblem(p)
-	optimalPath := aStarSearch(prob, rgpHeuristic, shuffledActions())
-	s := prob.startState()
-	return s, optimalPath, prob.pathCost(optimalPath)
-}
-
-// SolveCollectMinablesProblem solves the "Collect All Minables" problem
-func SolveCollectMinablesProblem(p *Puzzle) (State, []Action, int) {
-	fmt.Println("Solving Collect All Minables Problem")
-	prob := newCollectMinablesProblem(p)
-	optimalPath := aStarSearch(prob, cmpHeuristic, shuffledActions())
-	s := prob.startState()
-	return s, optimalPath, prob.pathCost(optimalPath)
-}
-
-// Position is a (row, column) pair
-type Position struct{ R, C int }
-
-func sortPositions(s []Position) {
-	sort.Slice(s, func(i, j int) bool {
-		if s[i].R == s[j].R {
-			return s[i].C < s[j].C
-		}
-		return s[i].R < s[j].R
-	})
-}
-
-func duplicatePositions(s []Position) []Position {
-	c := make([]Position, len(s))
-	copy(c, s)
-	return c
 }

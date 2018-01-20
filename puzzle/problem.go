@@ -3,13 +3,14 @@ package puzzle
 import (
 	"bytes"
 	"fmt"
+	"math/rand"
 )
 
 type problem interface {
-	getPuzzle() *Puzzle
-	startState() State
-	isGoalState(State) bool
-	pathCost(path []Action) int
+	GetPuzzle() *Puzzle
+	StartState() State
+	IsGoalState(State) bool
+	PathCost(path []Action) int
 }
 
 // State of game
@@ -41,6 +42,7 @@ func (s State) rep() string {
 	return buf.String()
 }
 
+// HasMined returns true if the position has been mined
 func (s State) HasMined(pos Position) bool {
 	for _, m := range s.mined {
 		if m.R == pos.R && m.C == pos.C {
@@ -50,6 +52,7 @@ func (s State) HasMined(pos Position) bool {
 	return false
 }
 
+// HasFilled returns true if the position has been filled
 func (s State) HasFilled(pos Position) bool {
 	for _, f := range s.filled {
 		if f.R == pos.R && f.C == pos.C {
@@ -130,6 +133,20 @@ const (
 var allActions = [...]Action{
 	North, South, East, West,
 	Mine, FillNorth, FillSouth, FillEast, FillWest,
+}
+
+func shuffledActions() []Action {
+	n := len(allActions)
+	list := make([]Action, 0, n)
+	for _, r := range rand.Perm(n) {
+		list = append(list, allActions[r])
+	}
+	fmt.Print("Order of actions: ")
+	for _, a := range list {
+		fmt.Print(a, " ")
+	}
+	fmt.Println()
+	return list
 }
 
 func (a Action) String() string {

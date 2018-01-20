@@ -84,36 +84,41 @@ func (g *grid) paint(renderer *sdl.Renderer) error {
 	return nil
 }
 
-type solution struct {
-	p     *puzzle.Puzzle
-	start puzzle.State
-	path  []puzzle.Action
-}
+type solution puzzle.Solution
 
 func (sol solution) show(events <-chan sdl.Event) <-chan error {
 	errc := make(chan error)
+	reportError := func(e error) {
+		if e != nil {
+			errc <- e
+		}
+	}
 
 	go func() {
 		defer close(errc)
 
-		width := int32(36 * sol.p.Width())
-		height := int32(36 * sol.p.Height())
+		p := sol.Problem.GetPuzzle()
+		width := int32(36 * p.Width())
+		height := int32(36 * p.Height())
 		w, r, err := sdl.CreateWindowAndRenderer(width, height, sdl.WINDOW_SHOWN)
-		if err != nil {
-			errc <- err
-		}
+		reportError(err)
 		defer w.Destroy()
 
-		g, err := newGrid(sol.p, sol.start, r)
-		if err != nil {
-			errc <- err
-		}
-		if err := g.paint(r); err != nil {
-			errc <- err
-		}
+		w.SetTitle(puzzle.Solution(sol).String())
 
-		tick := time.Tick(1000 * time.Millisecond)
-		s, i, done := sol.start, 0, false
+		reportError(r.Clear())
+		reportError(r.SetDrawColor(100, 100, 255, 255))
+		reportError(r.FillRect(&sdl.Rect{X: 0, Y: 0, W: width, H: height}))
+		r.Present()
+		time.Sleep(time.Second)
+
+		start := puzzle.Solution(sol).Start()
+		g, err := newGrid(p, start, r)
+		reportError(err)
+		reportError(g.paint(r))
+
+		tick := time.Tick(250 * time.Millisecond)
+		s, i, done := start, 0, false
 		for !done {
 			select {
 
@@ -125,12 +130,10 @@ func (sol solution) show(events <-chan sdl.Event) <-chan error {
 				}
 
 			case <-tick:
-				if i < len(sol.path) {
-					s = s.Successor(sol.p, sol.path[i])
+				if i < len(sol.Path) {
+					s = s.Successor(p, sol.Path[i])
 					g.state = s
-					if err := g.paint(r); err != nil {
-						errc <- err
-					}
+					reportError(g.paint(r))
 					i++
 				}
 			}
@@ -141,7 +144,7 @@ func (sol solution) show(events <-chan sdl.Event) <-chan error {
 }
 
 // Run draws a puzzle using SDL-2
-func Run(p *puzzle.Puzzle, start puzzle.State, path []puzzle.Action) error {
+func Run(sol puzzle.Solution) error {
 	err := sdl.Init(sdl.INIT_VIDEO)
 	if err != nil {
 		return err
@@ -152,8 +155,7 @@ func Run(p *puzzle.Puzzle, start puzzle.State, path []puzzle.Action) error {
 	sdl.SetHint(sdl.HINT_RENDER_SCALE_QUALITY, "1")
 
 	events := make(chan sdl.Event)
-	sol := solution{p: p, start: start, path: path}
-	errc := sol.show(events)
+	errc := solution(sol).show(events)
 
 	runtime.LockOSThread()
 	for {
