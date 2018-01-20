@@ -23,15 +23,27 @@ type Puzzle struct {
 	gr, gc int
 }
 
+// NewEmptyPuzzle returns a Puzzle with all cells set to Empty
+func NewEmptyPuzzle(height, width int) *Puzzle {
+	cell := make([][]CellType, height)
+	for r := range cell {
+		cell[r] = make([]CellType, width)
+		for c := range cell[r] {
+			cell[r][c] = Empty
+		}
+	}
+	return &Puzzle{cell: cell, sr: 0, sc: 0, gr: height - 1, gc: width - 1}
+}
+
 // Read a puzzle from the input
 func Read(input io.Reader) *Puzzle {
 	w, h, sr, sc, gr, gc := 0, 0, 0, 0, 0, 0
-	fmt.Fscanf(input, "%d %d\n", &w, &h)
+	fmt.Fscanf(input, "%d %d\n", &h, &w)
 	fmt.Fscanf(input, "%d %d\n", &sr, &sc)
 	fmt.Fscanf(input, "%d %d\n", &gr, &gc)
-	cell := make([][]CellType, w)
+	cell := make([][]CellType, h)
 	for r := range cell {
-		cell[r] = make([]CellType, h)
+		cell[r] = make([]CellType, w)
 		for c := range cell[r] {
 			var char byte
 			fmt.Fscanf(input, "%c", &char)
@@ -72,9 +84,35 @@ func (p *Puzzle) Cell(r, c int) CellType {
 	return p.cell[r][c]
 }
 
+// SetCell changes the type of given cell
+func (p *Puzzle) SetCell(r, c int, t CellType) {
+	p.cell[r][c] = t
+}
+
+// MoveStart moves the start position by delta values
+func (p *Puzzle) MoveStart(deltaRow, deltaColumn int) {
+	r, c := p.sr+deltaRow, p.sc+deltaColumn
+	if p.isValidCoordinate(r, c) {
+		p.sr, p.sc = r, c
+	}
+}
+
+// MoveGoal moves the goal position by delta values
+func (p *Puzzle) MoveGoal(deltaRow, deltaColumn int) {
+	r, c := p.gr+deltaRow, p.gc+deltaColumn
+	if p.isValidCoordinate(r, c) {
+		p.gr, p.gc = r, c
+	}
+}
+
 // IsGoalPosition returns true if (r, c) is the goal position
 func (p *Puzzle) IsGoalPosition(r, c int) bool {
 	return p.gr == r && p.gc == c
+}
+
+// IsStartPosition returns true if (r, c) is the start position
+func (p *Puzzle) IsStartPosition(r, c int) bool {
+	return p.sr == r && p.sc == c
 }
 
 func (p *Puzzle) count(t CellType) int {
@@ -116,7 +154,7 @@ func (p *Puzzle) Print() {
 			} else {
 				switch p.cell[r][c] {
 				case Empty:
-					fmt.Printf("  ")
+					fmt.Printf(". ")
 				case Wall:
 					fmt.Printf("* ")
 				case Minable:
@@ -127,5 +165,27 @@ func (p *Puzzle) Print() {
 			}
 		}
 		fmt.Println()
+	}
+}
+
+// Write puzzle to io.Writer in a format that can be read by Read()
+func (p *Puzzle) Write(w io.Writer) {
+	fmt.Fprintf(w, "%v %v\n", p.Height(), p.Width())
+	fmt.Fprintf(w, "%v %v\n", p.sr, p.sc)
+	fmt.Fprintf(w, "%v %v\n", p.gr, p.gc)
+	for r := range p.cell {
+		for c := range p.cell[r] {
+			switch p.cell[r][c] {
+			case Empty:
+				fmt.Fprintf(w, ".")
+			case Wall:
+				fmt.Fprintf(w, "*")
+			case Minable:
+				fmt.Fprintf(w, "M")
+			case Lava:
+				fmt.Fprintf(w, "L")
+			}
+		}
+		fmt.Fprintln(w)
 	}
 }

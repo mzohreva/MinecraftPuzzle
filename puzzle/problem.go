@@ -105,10 +105,9 @@ func (s State) Successor(p *Puzzle, a Action) State {
 		}
 	}
 	pos := Position{R: r, C: c}
-	cell := p.cell[r][c]
 	if p.isValidCoordinate(r, c) &&
 		len(mined) >= len(filled) &&
-		((cell == Empty || cell == Minable) || (cell == Lava && s.HasFilled(pos))) {
+		((p.cell[r][c] == Empty || p.cell[r][c] == Minable) || (p.cell[r][c] == Lava && s.HasFilled(pos))) {
 		return State{r: r, c: c, mined: mined, filled: filled}
 	}
 	return s
