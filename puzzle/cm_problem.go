@@ -18,8 +18,8 @@ func (p cmProblem) IsGoalState(s State) bool {
 	return s.r == p.puzzle.gr && s.c == p.puzzle.gc && len(s.mined) == p.puzzle.count(Minable)
 }
 
-func (p cmProblem) PathCost(path []Action) int {
-	return len(path)
+func (p cmProblem) ActionCost(a Action) int {
+	return 1
 }
 
 func cmpHeuristic(pr problem, s State) int {

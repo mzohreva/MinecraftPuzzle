@@ -18,8 +18,8 @@ func (p rgProblem) IsGoalState(s State) bool {
 	return s.r == p.puzzle.gr && s.c == p.puzzle.gc
 }
 
-func (p rgProblem) PathCost(path []Action) int {
-	return len(path)
+func (p rgProblem) ActionCost(a Action) int {
+	return 1
 }
 
 func rgpHeuristic(pr problem, s State) int {

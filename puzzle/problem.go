@@ -10,7 +10,7 @@ type problem interface {
 	GetPuzzle() *Puzzle
 	StartState() State
 	IsGoalState(State) bool
-	PathCost(path []Action) int
+	ActionCost(Action) int
 }
 
 // State of game
