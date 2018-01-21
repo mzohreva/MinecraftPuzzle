@@ -16,6 +16,7 @@ type runner interface {
 }
 
 func runGUI(r runner) error {
+	runtime.LockOSThread()
 	err := sdl.Init(sdl.INIT_VIDEO)
 	if err != nil {
 		return err
@@ -28,7 +29,6 @@ func runGUI(r runner) error {
 	events := make(chan sdl.Event)
 	errc := r.run(events)
 
-	runtime.LockOSThread()
 	for {
 		select {
 		case events <- sdl.WaitEvent():
