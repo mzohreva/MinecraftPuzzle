@@ -2,6 +2,7 @@ package gui
 
 import (
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/mzohreva/MinecraftPuzzle/puzzle"
@@ -23,6 +24,8 @@ func (d *designer) run(events <-chan sdl.Event) <-chan error {
 
 	go func() {
 		defer close(errc)
+
+		runtime.LockOSThread()
 
 		width := int32(cellWidth * d.width)
 		height := int32(cellHeight * d.height)

@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"runtime"
 	"time"
 
 	"github.com/mzohreva/MinecraftPuzzle/puzzle"
@@ -19,6 +20,8 @@ func (sol solution) run(events <-chan sdl.Event) <-chan error {
 
 	go func() {
 		defer close(errc)
+
+		runtime.LockOSThread()
 
 		p := sol.Problem.GetPuzzle()
 		width := int32(cellWidth * p.Width())
