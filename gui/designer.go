@@ -19,6 +19,7 @@ func (d *designer) run(events <-chan sdl.Event) <-chan error {
 	reportError := func(e error) {
 		if e != nil {
 			errc <- e
+			runtime.Goexit()
 		}
 	}
 
